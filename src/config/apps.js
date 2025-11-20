@@ -5,8 +5,8 @@ export const applications = [
     description: 'A web app for rolling virtual dice and tracking results.',
     logo: '/assets/dobbelen-logo.png',
     paths: {
-      main: '/dobbelen',
-      develop: '/dobbelen-dev',
+      main: ':30084',
+      develop: ':30090',
     },
   },
   {
@@ -15,8 +15,8 @@ export const applications = [
     description: 'An interactive quiz platform for creating and taking quizzes.',
     logo: '/assets/quizapp-logo.png',
     paths: {
-      main: '/quizapp',
-      develop: '/quizapp-dev',
+      main: ':30002',
+      develop: ':30003',
     },
   },
   {
@@ -25,8 +25,8 @@ export const applications = [
     description: 'Townsend application',
     logo: null,
     paths: {
-      main: '/townsend',
-      develop: '/townsend-dev',
+      main: ':30086',
+      develop: ':30088',
     },
   },
 ];
@@ -36,8 +36,8 @@ export const operations = [
     id: 'argocd',
     name: 'ArgoCD',
     description: 'GitOps continuous delivery',
-    path: '/argocd',
-    port: 30100,
+    path: ':30100',
+    port: null,
     icon: '🔄',
   },
 ];
