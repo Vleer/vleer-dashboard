@@ -1,0 +1,58 @@
+name: Build and Deploy to Microk8s
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+env:
+  REGISTRY: localhost:32000
+  IMAGE_NAME: dashboard
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine branch and base path
+        id: branch_info
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "base_path=/" >> $GITHUB_OUTPUT
+            echo "deploy_path=dashboard" >> $GITHUB_OUTPUT
+          else
+            echo "tag=develop" >> $GITHUB_OUTPUT
+            echo "base_path=/dashboard-dev/" >> $GITHUB_OUTPUT
+            echo "deploy_path=dashboard-develop" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg VITE_BASE_PATH=${{ steps.branch_info.outputs.base_path }} \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.branch_info.outputs.tag }} \
+            .
+
+      - name: Push to Microk8s registry
+        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.branch_info.outputs.tag }}
+
+      - name: Restart deployment
+        run: |
+          microk8s.kubectl rollout restart deployment/${{ env.IMAGE_NAME }} -n default || true
+          if [ "${{ github.ref }}" == "refs/heads/develop" ]; then
+            microk8s.kubectl rollout restart deployment/dashboard-develop -n default || true
+          fi
+
+      - name: Summary
+        run: |
+          echo "### Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.branch_info.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Base Path:** \`${{ steps.branch_info.outputs.base_path }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment:** \`${{ steps.branch_info.outputs.deploy_path }}\`" >> $GITHUB_STEP_SUMMARY
