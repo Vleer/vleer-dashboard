@@ -68,7 +68,7 @@ function App() {
                   
                   {/* Card */}
                   <a 
-                    href={app.paths.main.startsWith(':') ? `${window.location.protocol}//${window.location.hostname}${app.paths.main}` : `${baseUrl}${app.paths.main}`}
+                    href={`${baseUrl}${app.paths.main}`}
                     className="relative block bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm border border-slate-700/50 rounded-3xl p-8 hover:border-blue-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20"
                   >
                     <div className="flex items-start justify-between mb-4">
@@ -102,7 +102,7 @@ function App() {
                 {app.paths.develop && (
                   <div className="mt-3 ml-4">
                     <a 
-                      href={app.paths.develop.startsWith(':') ? `${window.location.protocol}//${window.location.hostname}${app.paths.develop}` : `${baseUrl}${app.paths.develop}`}
+                      href={`${baseUrl}${app.paths.develop}`}
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/40 border border-slate-800/50 text-slate-600 hover:text-slate-400 hover:border-slate-700/50 transition-all text-xs font-medium"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
@@ -125,7 +125,7 @@ function App() {
             {operations.map((op) => (
               <a
                 key={op.id}
-                href={op.path.startsWith(':') ? `${window.location.protocol}//${window.location.hostname}${op.path}` : buildServiceUrl(op.path, op.port)}
+                href={buildServiceUrl(op.path, op.port)}
                 className="group relative block bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/30 rounded-2xl p-6 hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10"
               >
                 <div className="flex items-center gap-4">
