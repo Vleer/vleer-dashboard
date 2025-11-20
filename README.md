@@ -1,4 +1,12 @@
-# Vleer Dashboard - Complete Setup
+# Vleer Dashboard
+
+[![GitHub](https://img.shields.io/badge/GitHub-Vleer%2Fvleer--dashboard-blue?logo=github)](https://github.com/Vleer/vleer-dashboard)
+[![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-7.2-646CFF?logo=vite)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
+
+> 🚀 Centralized hub for accessing all applications and services with path-based routing
 
 ## 🎯 Overview
 
