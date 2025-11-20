@@ -24,7 +24,7 @@ The Vleer Dashboard is a centralized hub for accessing all applications and serv
   - Develop: `http://192.168.0.24/townsend-dev/`
 
 ### Operations
-- **ArgoCD**: `http://192.168.0.24/argocd/`
+- **ArgoCD**: `http://192.168.0.24:30100/argocd/`
 
 ## 🎨 Dashboard Features
 
@@ -124,7 +124,7 @@ All endpoints tested and working:
 - ✅ Quiz Dev: `http://192.168.0.24/quizapp-dev/` → 200 OK
 - ✅ Townsend: `http://192.168.0.24/townsend/` → 301 (redirect)
 - ✅ Townsend Dev: `http://192.168.0.24/townsend-dev/` → 301 (redirect)
-- ✅ ArgoCD: `http://192.168.0.24/argocd/` → 200 OK
+- ✅ ArgoCD: `http://192.168.0.24:30100/argocd/` → 200 OK
 
 All ingresses using path-based routing (no DNS required):
 ```
@@ -191,7 +191,8 @@ const apps = [
 
 ## 🔐 Security Notes
 
-- All services accessible on port 80 (HTTP)
+- Dashboard and app ingresses accessible on port 80 (HTTP)
+- ArgoCD exposed on port 30100
 - Consider adding TLS/HTTPS for production
 - ArgoCD uses HTTPS backend protocol
 - CORS enabled for Quiz App

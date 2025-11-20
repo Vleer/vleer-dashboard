@@ -1,25 +1,36 @@
 import React from 'react';
 import './index.css';
 
-// Get the base URL dynamically
-const getBaseUrl = () => {
+// Build the base URL dynamically, with optional port override
+const getBaseUrl = (portOverride) => {
   const protocol = window.location.protocol;
   const hostname = window.location.hostname;
-  const port = window.location.port ? `:${window.location.port}` : '';
-  return `${protocol}//${hostname}${port}`;
+  const port = portOverride ?? window.location.port;
+  const portSegment = port ? `:${port}` : '';
+  return `${protocol}//${hostname}${portSegment}`;
+};
+
+// Build a full URL to a service, forcing a specific port when provided
+const buildServiceUrl = (path, port) => {
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  const portSegment = port ? `:${port}` : '';
+  return `${protocol}//${hostname}${portSegment}${path}`;
 };
 
 const apps = [
   { 
     name: 'Dobbelen', 
-    description: 'Dice rolling application',
+    description: 'A web app for rolling virtual dice and tracking results.',
     path: '/dobbelen',
-    developPath: null 
+    logo: '/assets/dobbelen-logo.png',
+    developPath: '/dobbelen-dev' 
   },
   { 
     name: 'Quiz App', 
-    description: 'Interactive quiz platform',
+    description: 'An interactive quiz platform for creating and taking quizzes.',
     path: '/quizapp',
+    logo: '/assets/quizapp-logo.png',
     developPath: '/quizapp-dev'
   },
   { 
@@ -35,6 +46,7 @@ const operations = [
     name: 'ArgoCD',
     description: 'GitOps continuous delivery',
     path: '/argocd',
+    port: 30100,
     icon: '🔄'
   }
 ];
@@ -84,8 +96,17 @@ function App() {
                     className="relative block bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm border border-slate-700/50 rounded-3xl p-8 hover:border-blue-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20"
                   >
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl shadow-lg">
-                        ✨
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl shadow-lg overflow-hidden">
+                        {app.logo ? (
+                          <img
+                            src={app.logo}
+                            alt={`${app.name} logo`}
+                            className="w-full h-full object-contain"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          />
+                        ) : (
+                          <span className="text-2xl">✨</span>
+                        )}
                       </div>
                       <div className="text-slate-500 group-hover:text-blue-400 transition-colors">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,7 +149,7 @@ function App() {
             {operations.map((op) => (
               <a
                 key={op.name}
-                href={`${baseUrl}${op.path}`}
+                href={buildServiceUrl(op.path, op.port)}
                 className="group relative block bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/30 rounded-2xl p-6 hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10"
               >
                 <div className="flex items-center gap-4">
