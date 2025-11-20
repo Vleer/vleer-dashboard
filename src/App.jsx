@@ -1,43 +1,31 @@
 import React from 'react';
 import './index.css';
+import { applications, operations } from './config/apps';
 
-// Get the base URL dynamically
-const getBaseUrl = () => {
+const configuredOrigin = import.meta.env.VITE_BASE_ORIGIN;
+
+// Build the base URL dynamically, with optional port override
+const getBaseUrl = (portOverride) => {
+  // If a fixed origin is provided (e.g. http://192.168.0.24), honor it
+  if (configuredOrigin) {
+    return configuredOrigin.replace(/\/$/, '');
+  }
+
   const protocol = window.location.protocol;
   const hostname = window.location.hostname;
-  const port = window.location.port ? `:${window.location.port}` : '';
-  return `${protocol}//${hostname}${port}`;
+  const port = portOverride ?? window.location.port;
+  const explicitOverride = portOverride !== undefined && portOverride !== null;
+  const isStandardPort = port === '' || port === '80' || port === '443';
+
+  // If the dashboard is served on a NodePort/port-forward (non-standard port) and no explicit
+  // override was given, fall back to the ingress port (80/443) so links resolve correctly.
+  const portToUse = explicitOverride ? port : (isStandardPort ? port : '');
+  const portSegment = portToUse ? `:${portToUse}` : '';
+  return `${protocol}//${hostname}${portSegment}`;
 };
 
-const apps = [
-  { 
-    name: 'Dobbelen', 
-    description: 'Dice rolling application',
-    path: '/dobbelen',
-    developPath: null 
-  },
-  { 
-    name: 'Quiz App', 
-    description: 'Interactive quiz platform',
-    path: '/quizapp',
-    developPath: '/quizapp-dev'
-  },
-  { 
-    name: 'Townsend', 
-    description: 'Townsend application',
-    path: '/townsend',
-    developPath: '/townsend-dev'
-  },
-];
-
-const operations = [
-  {
-    name: 'ArgoCD',
-    description: 'GitOps continuous delivery',
-    path: '/argocd',
-    icon: '🔄'
-  }
-];
+// Build a full URL to a service, forcing a specific port when provided
+const buildServiceUrl = (path, port) => `${getBaseUrl(port)}${path}`;
 
 function App() {
   const baseUrl = getBaseUrl();
@@ -71,8 +59,8 @@ function App() {
         <section className="mb-20">
           <h2 className="text-3xl font-bold mb-8 text-slate-200">Applications</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {apps.map((app) => (
-              <div key={app.name} className="group relative">
+            {applications.map((app) => (
+              <div key={app.id} className="group relative">
                 {/* Main App Card */}
                 <div className="relative">
                   {/* Glow effect */}
@@ -80,12 +68,21 @@ function App() {
                   
                   {/* Card */}
                   <a 
-                    href={`${baseUrl}${app.path}`}
+                    href={`${baseUrl}${app.paths.main}`}
                     className="relative block bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm border border-slate-700/50 rounded-3xl p-8 hover:border-blue-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl shadow-lg">
-                        ✨
+                        {app.logo ? (
+                          <img
+                            src={app.logo}
+                            alt={`${app.name} logo`}
+                            className="w-full h-full object-contain"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          />
+                        ) : (
+                          <span className="text-2xl">✨</span>
+                        )}
                       </div>
                       <div className="text-slate-500 group-hover:text-blue-400 transition-colors">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,10 +99,10 @@ function App() {
                 </div>
 
                 {/* Develop Branch - Outside and Subtle */}
-                {app.developPath && (
+                {app.paths.develop && (
                   <div className="mt-3 ml-4">
                     <a 
-                      href={`${baseUrl}${app.developPath}`}
+                      href={`${baseUrl}${app.paths.develop}`}
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/40 border border-slate-800/50 text-slate-600 hover:text-slate-400 hover:border-slate-700/50 transition-all text-xs font-medium"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
@@ -127,8 +124,8 @@ function App() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {operations.map((op) => (
               <a
-                key={op.name}
-                href={`${baseUrl}${op.path}`}
+                key={op.id}
+                href={buildServiceUrl(op.path, op.port)}
                 className="group relative block bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/30 rounded-2xl p-6 hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10"
               >
                 <div className="flex items-center gap-4">
