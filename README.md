@@ -12,12 +12,15 @@
 
 The Vleer Dashboard is a centralized hub for accessing all applications and services running on your server. It uses **path-based routing** instead of DNS-based routing, making it accessible via IP address without requiring DNS configuration.
 
+> Tip: Set `VITE_BASE_ORIGIN=http://<ip-or-host>` when you build if you’re opening the dashboard through a port-forward/NodePort. This forces all links to point at the ingress origin (port 80/443) so they resolve correctly.
+
 ## 🌐 Access URLs
 
 **Main Dashboard**: `http://192.168.0.24`
 
 ### Applications
 - **Dobbelen**: `http://192.168.0.24/dobbelen/`
+  - Develop: `http://192.168.0.24/dobbelen-dev/`
 - **Quiz App**: `http://192.168.0.24/quizapp/`
   - Develop: `http://192.168.0.24/quizapp-dev/`
 - **Townsend**: `http://192.168.0.24/townsend/`
@@ -90,6 +93,8 @@ Example path structure:
 │   │   └── ingress.yaml          # Catch-all: /
 │   ├── dobbelen/
 │   │   └── ingress.yaml          # Path: /dobbelen
+│   ├── dobbelen-develop/
+│   │   └── ingress.yaml          # Path: /dobbelen-dev
 │   ├── quizapp/
 │   │   └── ingress.yaml          # Path: /quizapp
 │   ├── quizapp-develop/
@@ -132,6 +137,7 @@ NAMESPACE   NAME                       CLASS   HOSTS
 argocd      argocd-server-ingress      nginx   *       
 default     dashboard-ingress          nginx   *       
 default     dobbelen-ingress           nginx   *       
+default     dobbelen-ingress-develop   nginx   *       
 default     quizapp-ingress            nginx   *       
 default     quizapp-ingress-develop    nginx   *       
 default     townsend-ingress           nginx   *       
@@ -174,15 +180,20 @@ spec:
                   number: 80
 ```
 
-2. **Update dashboard** in `/home/vleer/dashboard/src/App.jsx`:
+2. **Update dashboard** in `/home/vleer/dashboard/src/config/apps.js`:
 ```jsx
-const apps = [
+// src/config/apps.js
+export const applications = [
   // ... existing apps
-  { 
-    name: 'Your App', 
+  {
+    id: 'yourapp',
+    name: 'Your App',
     description: 'Your app description',
-    path: '/yourapp',
-    developPath: '/yourapp-dev' // optional
+    logo: null,
+    paths: {
+      main: '/yourapp',
+      develop: '/yourapp-dev', // optional
+    },
   },
 ];
 ```
