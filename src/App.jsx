@@ -34,8 +34,6 @@ const buildServiceUrl = (path, port) => {
 };
 
 function App() {
-  const baseUrl = getBaseUrl();
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f5f1e8] via-[#e8e4d9] to-[#d4cfc0] text-[#3a3a2f] font-serif selection:bg-[#9b8b6f] selection:text-white overflow-hidden relative">
       {/* Art Nouveau Background Pattern */}
