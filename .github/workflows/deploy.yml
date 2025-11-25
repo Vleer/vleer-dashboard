@@ -42,23 +42,24 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Determine branch
-        id: branch_info
+      - name: Determine branch and image tag
+        id: meta
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "deploy_path=dashboard" >> $GITHUB_OUTPUT
           else
             echo "tag=develop" >> $GITHUB_OUTPUT
-            echo "deploy_path=dashboard-develop" >> $GITHUB_OUTPUT
           fi
+          # Convert to lowercase for GHCR
+          REGISTRY_IMAGE=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
+          echo "registry_image=${REGISTRY_IMAGE}" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.branch_info.outputs.tag }}
+          tags: ${{ steps.meta.outputs.registry_image }}:${{ steps.meta.outputs.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -66,5 +67,5 @@ jobs:
         run: |
           echo "### Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.branch_info.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`${{ steps.meta.outputs.registry_image }}:${{ steps.meta.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
