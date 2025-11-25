@@ -25,8 +25,8 @@ export const applications = [
     description: 'Townsend application',
     logo: null,
     paths: {
-      main: '/townsend',
-      develop: '/townsend-dev',
+      main: 'http://192.168.0.24:32080/client/index.html',
+      develop: 'http://192.168.0.24:32090/client/index.html',
     },
   },
 ];
