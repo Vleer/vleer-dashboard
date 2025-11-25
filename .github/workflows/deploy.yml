@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/dashboard
+  IMAGE_NAME: vleer/vleer-dashboard
 
 jobs:
   verify:
