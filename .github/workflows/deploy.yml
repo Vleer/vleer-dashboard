@@ -40,8 +40,10 @@ jobs:
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "deployment=dashboard" >> $GITHUB_OUTPUT
           else
             echo "tag=develop" >> $GITHUB_OUTPUT
+            echo "deployment=dashboard-develop" >> $GITHUB_OUTPUT
           fi
           # Convert to lowercase for GHCR
           REGISTRY_IMAGE=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
@@ -61,5 +63,37 @@ jobs:
           echo "### Build Summary :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Image:** \`${{ steps.meta.outputs.registry_image }}:${{ steps.meta.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment:** \`${{ steps.meta.outputs.deployment }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** ✅ Docker image built successfully" >> $GITHUB_STEP_SUMMARY
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine deployment name
+        id: deploy_info
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "deployment=dashboard" >> $GITHUB_OUTPUT
+          else
+            echo "deployment=dashboard-develop" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Restart deployment
+        run: |
+          microk8s.kubectl rollout restart deployment/${{ steps.deploy_info.outputs.deployment }} -n default
+          microk8s.kubectl rollout status deployment/${{ steps.deploy_info.outputs.deployment }} -n default --timeout=5m
+        continue-on-error: false
+
+      - name: Deployment Summary
+        run: |
+          echo "### Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment:** \`${{ steps.deploy_info.outputs.deployment }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ✅ Pods restarted and rolled out successfully" >> $GITHUB_STEP_SUMMARY
