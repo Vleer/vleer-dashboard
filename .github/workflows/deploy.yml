@@ -32,9 +32,9 @@ jobs:
         id: deploy_info
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "deployment=dashboard" >> $GITHUB_OUTPUT
+            echo "deployment=vleer-dashboard" >> $GITHUB_OUTPUT
           else
-            echo "deployment=dashboard-develop" >> $GITHUB_OUTPUT
+            echo "deployment=vleer-dashboard-develop" >> $GITHUB_OUTPUT
           fi
 
       - name: Restart deployment and wait for rollout
