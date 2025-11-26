@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: vleer/vleer-dashboard
+  REGISTRY: localhost:32000
+  IMAGE_NAME: dashboard
 
 jobs:
   verify:
@@ -49,11 +49,11 @@ jobs:
           REGISTRY_IMAGE=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
           echo "registry_image=${REGISTRY_IMAGE}" >> $GITHUB_OUTPUT
 
-      - name: Build Docker image
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: false
+          push: true
           tags: ${{ steps.meta.outputs.registry_image }}:${{ steps.meta.outputs.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -63,9 +63,10 @@ jobs:
           echo "### Build Summary :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Image:** \`${{ steps.meta.outputs.registry_image }}:${{ steps.meta.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Registry:** \`localhost:32000\` (Microk8s)" >> $GITHUB_STEP_SUMMARY
           echo "**Deployment:** \`${{ steps.meta.outputs.deployment }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Status:** ✅ Docker image built successfully" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ✅ Docker image built and pushed successfully" >> $GITHUB_STEP_SUMMARY
 
   deploy:
     needs: build
