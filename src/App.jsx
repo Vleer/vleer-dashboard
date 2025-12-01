@@ -50,24 +50,10 @@ function App() {
         </svg>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
-        {/* Compact Header with Logo */}
-        <header className="mb-12 text-center">
-          <div className="inline-block">
-            <img 
-              src="/image.png" 
-              alt="Vleer Logo" 
-              className="w-[512px] h-[512px] mx-auto drop-shadow-2xl"
-              style={{
-                filter: 'drop-shadow(0 10px 30px rgba(155, 139, 111, 0.3))'
-              }}
-            />
-          </div>
-        </header>
-
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-4">
         {/* Applications Section */}
-        <section className="mb-16">
-          <h2 className="text-4xl font-bold mb-8 text-center text-[#5a5a4f] relative inline-block w-full">
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-center text-[#5a5a4f] relative inline-block w-full">
             <span className="relative">
               Applications
               <svg className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-2" viewBox="0 0 128 8" xmlns="http://www.w3.org/2000/svg">
@@ -155,8 +141,8 @@ function App() {
         </section>
 
         {/* Operations Section */}
-        <section>
-          <h2 className="text-4xl font-bold mb-8 text-center text-[#5a5a4f] relative inline-block w-full">
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-center text-[#5a5a4f] relative inline-block w-full">
             <span className="relative">
               Operations
               <svg className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-2" viewBox="0 0 128 8" xmlns="http://www.w3.org/2000/svg">
@@ -191,7 +177,7 @@ function App() {
         </section>
 
         {/* Footer with Art Nouveau styling */}
-        <footer className="mt-20 text-center text-[#6a6a5f] text-sm">
+        <footer className="mt-12 text-center text-[#6a6a5f] text-sm">
           <div className="flex items-center justify-center gap-2 mb-4">
             <svg className="w-16 h-1" viewBox="0 0 64 4" xmlns="http://www.w3.org/2000/svg">
               <path d="M0,2 Q16,0 32,2 Q48,4 64,2" fill="none" stroke="#9b8b6f" strokeWidth="1"/>
