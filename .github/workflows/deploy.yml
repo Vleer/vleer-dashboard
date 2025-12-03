@@ -89,18 +89,31 @@ jobs:
           sed -i "s|image: .*${{ env.IMAGE_NAME }}.*|image: ${{ env.REGISTRY }}/${{ needs.build-and-push.outputs.repo_owner_lowercase }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" deployment.yaml
           sed -i "s|image: localhost:32000/vleer-dashboard.*|image: ${{ env.REGISTRY }}/${{ needs.build-and-push.outputs.repo_owner_lowercase }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" deployment.yaml
           
-          # Add or update restartedAt annotation to force pod restart
+          # Add or update restartedAt annotation using Python
           TIMESTAMP=$(date +%s)
-          if grep -q "restartedAt:" deployment.yaml; then
-            sed -i "s|restartedAt: \".*\"|restartedAt: \"$TIMESTAMP\"|g" deployment.yaml
-          else
-            # Add annotations section if it doesn't exist
-            if grep -q "annotations:" deployment.yaml; then
-              sed -i "/annotations:/a\\        restartedAt: \"$TIMESTAMP\"" deployment.yaml
-            else
-              sed -i "/template:/,/metadata:/{/metadata:/a\\      annotations:\n        restartedAt: \"$TIMESTAMP\"" deployment.yaml
-            fi
-          fi
+          python3 << 'EOF'
+          import re
+          import os
+          
+          timestamp = os.environ.get('TIMESTAMP', '0')
+          
+          with open('deployment.yaml', 'r') as f:
+              content = f.read()
+          
+          # Check if restartedAt already exists
+          if 'restartedAt:' in content:
+              content = re.sub(r'restartedAt: "[^"]*"', f'restartedAt: "{timestamp}"', content)
+          else:
+              # Find the template metadata labels section and add annotations before it
+              content = re.sub(
+                  r'(template:\s*\n\s*metadata:\s*\n)(\s*labels:)',
+                  r'\1      annotations:\n        restartedAt: "' + timestamp + '"\n\2',
+                  content
+              )
+          
+          with open('deployment.yaml', 'w') as f:
+              f.write(content)
+          EOF
           
           echo "Updated deployment.yaml:"
           cat deployment.yaml
