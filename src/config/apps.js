@@ -45,7 +45,7 @@ export const applications = [
     description: 'Task management and to-do list application.',
     logo: null,
     paths: {
-      main: 'http://192.168.0.24:3000',
+      main: '/todo',
       develop: null,
     },
   },
