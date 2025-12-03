@@ -89,6 +89,19 @@ jobs:
           sed -i "s|image: .*${{ env.IMAGE_NAME }}.*|image: ${{ env.REGISTRY }}/${{ needs.build-and-push.outputs.repo_owner_lowercase }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" deployment.yaml
           sed -i "s|image: localhost:32000/vleer-dashboard.*|image: ${{ env.REGISTRY }}/${{ needs.build-and-push.outputs.repo_owner_lowercase }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|g" deployment.yaml
           
+          # Add or update restartedAt annotation to force pod restart
+          TIMESTAMP=$(date +%s)
+          if grep -q "restartedAt:" deployment.yaml; then
+            sed -i "s|restartedAt: \".*\"|restartedAt: \"$TIMESTAMP\"|g" deployment.yaml
+          else
+            # Add annotations section if it doesn't exist
+            if grep -q "annotations:" deployment.yaml; then
+              sed -i "/annotations:/a\\        restartedAt: \"$TIMESTAMP\"" deployment.yaml
+            else
+              sed -i "/template:/,/metadata:/{/metadata:/a\\      annotations:\n        restartedAt: \"$TIMESTAMP\"" deployment.yaml
+            fi
+          fi
+          
           echo "Updated deployment.yaml:"
           cat deployment.yaml
 
